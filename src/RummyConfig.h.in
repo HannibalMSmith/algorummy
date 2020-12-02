@@ -1,0 +1,2 @@
+#define Rummy_CONFIG_MAJOR @Rummy_CONFIG_MAJOR@
+#define Rummy_CONFIG_MINOR @Rummy_CONFIG_MINOR@
