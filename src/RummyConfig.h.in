@@ -1,2 +1,4 @@
-#define Rummy_CONFIG_MAJOR @Rummy_CONFIG_MAJOR@
-#define Rummy_CONFIG_MINOR @Rummy_CONFIG_MINOR@
+#define Rummy_VERSION_MAJOR @Rummy_VERSION_MAJOR@
+#define Rummy_VERSION_MINOR @Rummy_VERSION_MINOR@
+#define Rummy_VERSION_PATCH @Rummy_VERSION_PATCH@
+#define Rummy_VERSION_TWEAK @Rummy_VERSION_TWEAK@

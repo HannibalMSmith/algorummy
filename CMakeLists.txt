@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
-project(Rummy VERSION 1.0)
+project(Rummy VERSION 1.0.0.1)
 
 configure_file("${CMAKE_SOURCE_DIR}/src/RummyConfig.h.in" "${CMAKE_SOURCE_DIR}/src/RummyConfig.h")
 
