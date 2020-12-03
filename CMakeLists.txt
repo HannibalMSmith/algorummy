@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE RelWithDebInfo)
+#set(CMAKE_BUILD_TYPE Release)
+
 
 project(Rummy VERSION 1.0.0.1)
 
