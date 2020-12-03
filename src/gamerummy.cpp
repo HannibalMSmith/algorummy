@@ -42,11 +42,25 @@ void Mgr::tryPickRun(const map<int, PCard> &hand, vector<CardGroup> &matchlist, 
     });
 
     for_each(coloredgrouplist.begin(), coloredgrouplist.end(),
+    [](const CardGroup &group)
+    {
+        cout <<"tryPickRun group:" << group.id_ << endl;
+       for_each(group.cardlist_.begin(), group.cardlist_.end(),
+       [](const PCard card)
+       {
+           cout <<"suit:" << card->suit_ << " rank:" << card->rank_ << endl;
+       });     
+    }
+    );
+
+
+    for_each(coloredgrouplist.begin(), coloredgrouplist.end(),
     [&matchlist](CardGroup &group)
     {
         std::sort(group.cardlist_.begin(), group.cardlist_.end(), [](const PCard &a, const PCard &b){return a >b;});
         pickRunFromGroup(group, matchlist);
-    });
+    }
+    );
 
     for_each(matchlist.begin(), matchlist.end(),
     [](const CardGroup &group)
@@ -54,7 +68,8 @@ void Mgr::tryPickRun(const map<int, PCard> &hand, vector<CardGroup> &matchlist, 
         cout << "groupid:" << group.id_ << " " << endl;
         for_each(group.cardlist_.begin(), group.cardlist_.end(), [](const PCard &card ){cout << "suit: "<<card->suit_ << " rank: " << card->rank_<< endl;});
         cout << endl;
-    });
+    }
+    );
 
 }
 
