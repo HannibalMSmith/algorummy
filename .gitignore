@@ -34,6 +34,9 @@
 #vscode config file
 .vscode/*
 
+#coredump file
+core.*
+
 #cmake
 CMakeLists.txt.user
 CMakeCache.txt

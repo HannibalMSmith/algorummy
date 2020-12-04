@@ -16,7 +16,12 @@ int CardGroup::idx = 0;
 
 void CardGroup::delCard(const PCard &card)
 {
-    //cardlist_.erase(std::find(cardlist_.begin(), cardlist_.end(),  [](const PCard &a, const PCard &b){return a->id_ == b->id_;}));
+
+    // cardlist_.erase(std::find(cardlist_.begin(), cardlist_.end(),
+    // [card](const PCard &rhs)
+    // {
+    //     return card->id_ == rhs->id_;
+    // }));
     cardlist_.erase(std::find(cardlist_.begin(), cardlist_.end(), card));
 }
 
@@ -79,12 +84,17 @@ void Mgr::pickRunFromGroup(CardGroup &group, vector<CardGroup> &matchlist)
     {
         return;
     }
-    CardGroup tmpGroup;
+    
     auto it = group.cardlist_.begin();
-    while ((*it)->bmagic_)
+    do
     {
-        ++it;
-    }
+        if ((*it)->bmagic_)
+        {
+            ++it;
+        }
+        
+    } while (it != group.cardlist_.end());
+    CardGroup tmpGroup;
     tmpGroup.cardlist_.push_back(*it);
     for (; it != group.cardlist_.end() -1; ++it)
     {
