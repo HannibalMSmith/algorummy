@@ -2,27 +2,25 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
-using std::map;
-using std::vector;
-using std::for_each;
 using std::cout;
 using std::endl;
-
+using std::for_each;
+using std::map;
+using std::shared_ptr;
+using std::vector;
 
 int Card::idx = 0;
 int CardGroup::idx = 0;
 
-
-
 void CardGroup::delCard(const PCard &card)
 {
-
-    // cardlist_.erase(std::find(cardlist_.begin(), cardlist_.end(),
-    // [card](const PCard &rhs)
-    // {
-    //     return card->id_ == rhs->id_;
-    // }));
     cardlist_.erase(std::find(cardlist_.begin(), cardlist_.end(), card));
+}
+
+void CardGroup::reset()
+{
+    id_ = genId();
+    cardlist_.clear();
 }
 
 void Mgr::match(const map<int, PCard> &hand, vector<CardGroup> &grouplist)
@@ -33,7 +31,6 @@ void Mgr::match(const map<int, PCard> &hand, vector<CardGroup> &grouplist)
     tryPickRun(hand, matchlist, candidates);
 }
 
-//按花色倒序分组提取同花顺（排除金）
 void Mgr::tryPickRun(const map<int, PCard> &hand, vector<CardGroup> &matchlist, vector<CardGroup> &candidates)
 {
     matchlist.clear();
@@ -41,79 +38,64 @@ void Mgr::tryPickRun(const map<int, PCard> &hand, vector<CardGroup> &matchlist, 
     std::vector<CardGroup> coloredgrouplist;
     coloredgrouplist.resize(c_suitcout);
     for_each(hand.begin(), hand.end(),
-    [&coloredgrouplist, &matchlist](std::pair<const int, PCard> item)
-    {
-        coloredgrouplist[item.second->suit_-1].cardlist_.push_back(item.second);
-    });
+             [&coloredgrouplist, &matchlist](std::pair<const int, PCard> item) {
+                 coloredgrouplist[item.second->suit_ - 1].cardlist_.push_back(item.second);
+             });
 
+    
     for_each(coloredgrouplist.begin(), coloredgrouplist.end(),
-    [](const CardGroup &group)
-    {
-        cout <<"tryPickRun group:" << group.id_ << endl;
-       for_each(group.cardlist_.begin(), group.cardlist_.end(),
-       [](const PCard card)
-       {
-           cout <<"suit:" << card->suit_ << " rank:" << card->rank_ << endl;
-       });     
-    }
-    );
-
-
-    for_each(coloredgrouplist.begin(), coloredgrouplist.end(),
-    [&matchlist](CardGroup &group)
-    {
-        std::sort(group.cardlist_.begin(), group.cardlist_.end(), [](const PCard &a, const PCard &b){return a >b;});
-        pickRunFromGroup(group, matchlist);
-    }
-    );
-
-    for_each(matchlist.begin(), matchlist.end(),
-    [](const CardGroup &group)
-    {   
-        cout << "groupid:" << group.id_ << " " << endl;
-        for_each(group.cardlist_.begin(), group.cardlist_.end(), [](const PCard &card ){cout << "suit: "<<card->suit_ << " rank: " << card->rank_<< endl;});
-        cout << endl;
-    }
-    );
-
+             [&matchlist](CardGroup &group) {
+                 std::sort(group.cardlist_.begin(), group.cardlist_.end(), [](const PCard &a, const PCard &b) { return a->rank_ > b->rank_; });
+                 pickRunFromGroup(group, matchlist);
+             });
+    
+    cout<<"同花组"<<endl;
+    for_each(matchlist.begin(), matchlist.end(), Mgr::printCardGroup);
 }
 
-void Mgr::pickRunFromGroup(CardGroup &group, vector<CardGroup> &matchlist)
+void Mgr::pickRunFromGroup(const CardGroup &group, vector<CardGroup> &matchlist)
 {
+    
     if (group.cardlist_.size() < 3)
     {
         return;
     }
-    
-    auto it = group.cardlist_.begin();
-    do
+
+    auto last = group.cardlist_.begin();
+    for (auto it = group.cardlist_.begin(); it != group.cardlist_.end(); ++it)
     {
-        if ((*it)->bmagic_)
+        CardGroup tmpGroup;
+        tmpGroup.cardlist_.push_back(*last);
+        if ((*it)->bmagic_ || (*it)->rank_ == (*last)->rank_)
         {
-            ++it;
+            continue;
+        }
+        else if (!((*it)->bmagic_) && (*last)->rank_ - (*it)->rank_ == 1)
+        {
+            tmpGroup.cardlist_.push_back(*it);
+            last = it;
         }
         
-    } while (it != group.cardlist_.end());
-    CardGroup tmpGroup;
-    tmpGroup.cardlist_.push_back(*it);
-    for (; it != group.cardlist_.end() -1; ++it)
-    {
-        if((!(*it)->bmagic_) && (!(*(it+1))->bmagic_) && (*it)->rank_ - (*(it+1))->rank_ == 1 )
+        if (tmpGroup.cardlist_.size() == 3)
         {
-            tmpGroup.cardlist_.push_back(*(it+1));
-            if(tmpGroup.cardlist_.size() ==3)
+            matchlist.push_back(tmpGroup);
+            tmpGroup.reset();
+            if (it+1 != group.cardlist_.end())
             {
-                matchlist.push_back(tmpGroup);
-                for_each(tmpGroup.cardlist_.begin(), tmpGroup.cardlist_.end(), [&group](const PCard &card){group.delCard(card);});
-                tmpGroup.cardlist_.clear();
-                if (it == group.cardlist_.end() -1)
-                {
-                    break;
-                }
-                it = ++it;
-                tmpGroup.cardlist_.push_back(*it);
-            } 
-        }     
+                last = it+1;
+                tmpGroup.cardlist_.push_back(*last);
+            }
+        }
     }
+}
+
+void Mgr::printCardGroup(CardGroup &group)
+{
+    cout<<"group: "<<group.id_<<" info"<<endl;
+    for_each(group.cardlist_.begin(), group.cardlist_.end(),
+             [](const PCard card) {
+                 cout << "suit:" << card->suit_ << " rank:" << card->rank_ << endl;
+             });
 
 }
+

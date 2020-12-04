@@ -20,7 +20,7 @@ public:
     Card() : suit_(e_joker),rank_(0), bmagic_(false), id_(Card::genId()) {}
     Card(E_SUIT suit, int rank, bool bmagic, int id = Card::genId()) : suit_(suit),rank_(rank), bmagic_(bmagic = false), id_(id){}
     static int genId(){return ++idx;}
-    bool operator() (const Card &rhs) {return id_ == rhs.id_;}
+    bool operator== (const Card &rhs) {return id_ == rhs.id_;}
 public:
     E_SUIT suit_;
     int rank_;
@@ -37,7 +37,7 @@ public:
     static int genId(){return ++idx;}
     using PCard = std::shared_ptr<Card>;
     void delCard(const PCard &card);
-    
+    void reset();
 public:
     int id_;
     std::vector<std::shared_ptr<Card>> cardlist_;    
@@ -52,7 +52,8 @@ public:
     using PCard = std::shared_ptr<Card>;
     void match(const std::map<int, PCard> &hand, std::vector<CardGroup> &grouplist);
     void tryPickRun(const std::map<int, PCard> &hand, std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates);
-    static void pickRunFromGroup(CardGroup &group, std::vector<CardGroup> &matchlist);
+    static void pickRunFromGroup(const CardGroup &group, std::vector<CardGroup> &matchlist);
+    static void printCardGroup(CardGroup &group);
 private:
     std::map<int, PCard> hand_;  
 };
