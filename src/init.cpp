@@ -52,13 +52,13 @@ bool init(const char *script, std::map<int, std::shared_ptr<Card>> &hand, Card &
     {
         int suit = root["hand"][0]["card"][i]["suit"].asInt();
         int rank = root["hand"][0]["card"][i]["rank"].asInt();
-        PCard card = std::make_shared<Card>(static_cast<E_SUIT>(suit), rank, rank == magic.rank_);
+        const PCard &card = std::make_shared<Card>(static_cast<E_SUIT>(suit), rank, magic.rank_);
         hand.insert(std::make_pair(card->id_, card));
     }
 
     for (auto item : hand)
     {
-        cout << "card id " << item.second->id_ << " suit " << item.second->suit_ << " rank " << item.second->rank_ << endl;
+        cout << "card id" << item.second->id_ <<": "<< item.second->suit_ << ":" << item.second->rank_ << ":" << std::boolalpha << item.second->magic_ << endl;
     }
     return true;
 }
