@@ -20,12 +20,13 @@ int main(int argc, char **argv)
 
     using PCard = shared_ptr<Card>;
     map<int, PCard> hand;
-    Card magic;
-    if(!init(script.c_str(), hand, magic))
+    Card special;
+    if(!init(script.c_str(), hand, special))
         return 1;
 
-    Mgr mgr;
     std::vector<CardGroup> groupList;
+    Mgr mgr;
+    mgr.special_ = special.rank_;
     mgr.match(hand, groupList);
 
     return 0;

@@ -23,60 +23,65 @@ void CardGroup::reset()
     cardlist_.clear();
 }
 
-void Mgr::match(const map<int, PCard> &hand, vector<CardGroup> &grouplist)
+int Mgr::match(const map<int, PCard> &hand, vector<CardGroup> &grouplist)
 {
     grouplist.clear();
     vector<CardGroup> matchlist;
     vector<CardGroup> candidates;
-    tryPickRun(hand, matchlist, candidates);
+    pickRun(hand, matchlist, candidates);
+    return 0;
 }
 
-void Mgr::tryPickRun(const map<int, PCard> &hand, vector<CardGroup> &matchlist, vector<CardGroup> &candidates)
+int Mgr::pickRun(const map<int, PCard> &hand, vector<CardGroup> &matchlist, vector<CardGroup> &candidates)
 {
     matchlist.clear();
     candidates.clear();
-    std::vector<CardGroup> coloredgrouplist;
-    coloredgrouplist.resize(c_suitcout);
+    std::vector<CardGroup> suitlist;
+    suitlist.resize(c_suit);
     for_each(hand.begin(), hand.end(),
-             [&coloredgrouplist, &matchlist](std::pair<const int, PCard> item) {
-                 coloredgrouplist[item.second->suit_ - 1].cardlist_.push_back(item.second);
+             [&suitlist, &matchlist](std::pair<const int, PCard> item) {
+                 suitlist[item.second->suit_ - 1].cardlist_.push_back(item.second);
              });
 
     
-    for_each(coloredgrouplist.begin(), coloredgrouplist.end(),
-             [&matchlist](CardGroup &group) {
+    for_each(suitlist.begin(), suitlist.end(),
+             [&matchlist, &candidates](CardGroup &group) {
                  std::sort(group.cardlist_.begin(), group.cardlist_.end(), [](const PCard &a, const PCard &b) { return a->rank_ > b->rank_; });
-                 pickRunFromGroup(group, matchlist);
+                 pickRunFromGroup(group, matchlist, candidates);
              });
     
     cout<<"同花组"<<endl;
     for_each(matchlist.begin(), matchlist.end(), Mgr::printCardGroup);
+    return 0;
 }
 
-void Mgr::pickRunFromGroup(const CardGroup &group, vector<CardGroup> &matchlist)
+int Mgr::pickRunFromGroup(const CardGroup &group, vector<CardGroup> &matchlist, vector<CardGroup> &candidates)
 {
     
     if (group.cardlist_.size() < 3)
     {
-        return;
+        candidates.push_back(group);
+        return 0;
     }
 
+
+    //todo fix the error
+    CardGroup tmpGroup;
     auto last = group.cardlist_.begin();
     for (auto it = group.cardlist_.begin(); it != group.cardlist_.end(); ++it)
     {
-        CardGroup tmpGroup;
         tmpGroup.cardlist_.push_back(*last);
-        if ((*it)->bmagic_ || (*it)->rank_ == (*last)->rank_)
+        if ((*it)->magic_ || (*it)->rank_ == (*last)->rank_)
         {
             continue;
         }
-        else if (!((*it)->bmagic_) && (*last)->rank_ - (*it)->rank_ == 1)
+        else if ((*last)->rank_ - (*it)->rank_ == 1 && !((*it)->magic_))
         {
             tmpGroup.cardlist_.push_back(*it);
             last = it;
         }
         
-        if (tmpGroup.cardlist_.size() == 3)
+        if (tmpGroup.cardlist_.size() == C_minimum)
         {
             matchlist.push_back(tmpGroup);
             tmpGroup.reset();
@@ -86,10 +91,27 @@ void Mgr::pickRunFromGroup(const CardGroup &group, vector<CardGroup> &matchlist)
                 tmpGroup.cardlist_.push_back(*last);
             }
         }
+        else if((*it)->rank_ == 1 && (*tmpGroup.cardlist_.begin())->rank_ == 13 &&  (*(tmpGroup.cardlist_.begin()+1))->rank_==12)
+        {
+            tmpGroup.cardlist_.insert(tmpGroup.cardlist_.begin(), (*it));
+            if (tmpGroup.cardlist_.size() > C_minimum)
+            {
+                PCard card = *(tmpGroup.cardlist_.end()-1);
+                CardGroup tmp;
+                tmp.cardlist_.push_back(card);
+                candidates.push_back(tmp);
+                tmpGroup.cardlist_.pop_back();
+            }
+            
+            matchlist.push_back(tmpGroup);
+            tmpGroup.reset(); 
+        }
     }
+
+    return 0;
 }
 
-void Mgr::printCardGroup(CardGroup &group)
+void Mgr::printCardGroup(const CardGroup &group)
 {
     cout<<"group: "<<group.id_<<" info"<<endl;
     for_each(group.cardlist_.begin(), group.cardlist_.end(),
@@ -98,4 +120,3 @@ void Mgr::printCardGroup(CardGroup &group)
              });
 
 }
-
