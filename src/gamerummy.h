@@ -9,11 +9,11 @@ const int c_rank = 13;
 const int c_minimum =3;
 enum E_SUIT
 {
-    e_heart=1,
-    e_club,
+    e_joker=0,
     e_spade,
+    e_heart,
     e_diamond,
-    e_joker
+    e_club
 };
 
 class Card
@@ -43,10 +43,8 @@ public:
     static int genId(){return ++idx;}
     using PCard = std::shared_ptr<Card>;
     void removeCard(const PCard &card);
-    void removeCard(int id);
     void removeGroup(const CardGroup &rhs);
     void reset();
-    bool restarMatch(CardGroup &matched, std::vector<PCard>::iterator &start);
 public:
     int id_;
     std::vector<std::shared_ptr<Card>> cardlist_;   

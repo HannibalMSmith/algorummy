@@ -44,7 +44,8 @@ bool init(const char *script, std::map<int, std::shared_ptr<Card>> &hand, Card &
 
     magic.suit_ = static_cast<E_SUIT>(root["magiccard"]["suit"].asInt());
     magic.rank_ = root["magiccard"]["rank"].asInt();
-    cout << "magic " << magic.suit_ << ":" << magic.rank_ << endl;
+    
+    cout << "金牌：" << Mgr::getCardString(magic) << endl;
 
     using PCard = shared_ptr<Card>;
     int size = root["hand"][0]["card"].size();
@@ -56,9 +57,15 @@ bool init(const char *script, std::map<int, std::shared_ptr<Card>> &hand, Card &
         hand.insert(std::make_pair(card->id_, card));
     }
 
+    cout<<"初始手牌"<<endl;
     for (auto item : hand)
     {
-        cout << "card id" << item.second->id_ <<": "<< item.second->suit_ << ":" << item.second->rank_ << ":" << std::boolalpha << item.second->magic_ << endl;
+        cout<<Mgr::getCardString(*(item.second));
+        if (item.second->rank_ == magic.rank_)
+        {
+            cout<<" 金牌";
+        }
+        cout<<endl; 
     }
     return true;
 }

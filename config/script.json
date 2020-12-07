@@ -1,8 +1,8 @@
 {
-    "a":"1 红桃",
-    "b":"2 梅花",
-    "c":"3 黑桃",
-    "d":"4 方块",
+    "a":"1 黑桃",
+    "b":"2 红桃",
+    "c":"3 方块",
+    "d":"4 梅花",
     "e":"5 王",
     "magiccard":{
         "suit":2,
@@ -12,21 +12,20 @@
         {
             "player" : 0,
             "card": [
-                {"suit" : 1, "rank" : 7},
-                {"suit" : 1, "rank" : 8},
-                {"suit" : 1, "rank" : 9},
-                {"suit" : 1, "rank" : 10},
-                {"suit" : 1, "rank" : 11},
-                {"suit" : 1, "rank" : 12},
-                {"suit" : 2, "rank" : 6},
-                {"suit" : 2, "rank" : 7},
-                {"suit" : 2, "rank" : 7},
-                {"suit" : 2, "rank" : 10},
-                {"suit" : 3, "rank" : 10},
+                {"suit" : 4, "rank" : 7},
+                {"suit" : 4, "rank" : 8},
+                {"suit" : 4, "rank" : 9},
                 {"suit" : 4, "rank" : 10},
-                {"suit" : 5, "rank" : 0}
+                {"suit" : 4, "rank" : 11},
+                {"suit" : 4, "rank" : 12},
+                {"suit" : 3, "rank" : 6},
+                {"suit" : 3, "rank" : 7},
+                {"suit" : 3, "rank" : 7},
+                {"suit" : 3, "rank" : 10},
+                {"suit" : 2, "rank" : 10},
+                {"suit" : 1, "rank" : 10},
+                {"suit" : 0, "rank" : 0}
             ]
         }
     ]
-
 }
