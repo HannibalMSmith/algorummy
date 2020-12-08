@@ -124,13 +124,13 @@ int Mgr::match(const map<int, PCard> &hand, vector<CardGroup> &grouplist)
     grouplist.clear();
     vector<CardGroup> matchlist;
     vector<CardGroup> candidates;
-    pickRun(hand, matchlist, candidates);
-    pickHighestMeld(matchlist, candidates);
+    buildRun(hand, matchlist, candidates);
+    buildMeldFromGroup(matchlist, candidates);
 
     return 0;
 }
 
-int Mgr::pickRun(const map<int, PCard> &hand, vector<CardGroup> &matchlist, vector<CardGroup> &candidates)
+int Mgr::buildRun(const map<int, PCard> &hand, vector<CardGroup> &matchlist, vector<CardGroup> &candidates)
 {
     matchlist.clear();
     candidates.clear();
@@ -152,7 +152,7 @@ int Mgr::pickRun(const map<int, PCard> &hand, vector<CardGroup> &matchlist, vect
     std::for_each(suitlist.begin(), suitlist.end(),
                   [&matchlist, &candidates](CardGroup &group) {
                       std::sort(group.cardlist_.begin(), group.cardlist_.end(), [](const PCard &a, const PCard &b) { return a->rank_ > b->rank_; });
-                      pickRunFromGroup(group, matchlist, candidates);
+                    buildRunFromGroup(group, matchlist, candidates);
                   });
 
     cout << "同花组" << endl;
@@ -161,7 +161,7 @@ int Mgr::pickRun(const map<int, PCard> &hand, vector<CardGroup> &matchlist, vect
     return 0;
 }
 
-int Mgr::pickRunFromGroup(const CardGroup &group, vector<CardGroup> &matchlist, vector<CardGroup> &candidates)
+int Mgr::buildRunFromGroup(const CardGroup &group, vector<CardGroup> &matchlist, vector<CardGroup> &candidates)
 {
     int matched = 0;
     CardGroup groupCopy(group);
@@ -261,7 +261,7 @@ int Mgr::pickRunFromGroup(const CardGroup &group, vector<CardGroup> &matchlist, 
     return matched;
 }
 
-int Mgr::pickHighestMeld(std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates)
+int Mgr::buildMeldFromGroup(std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates)
 {
     std::for_each(candidates.begin(), candidates.end(), [](CardGroup &group) {
         std::sort(group.cardlist_.begin(), group.cardlist_.end(), [](const PCard &a, const PCard &b) {
@@ -280,3 +280,4 @@ int Mgr::pickHighestMeld(std::vector<CardGroup> &matchlist, std::vector<CardGrou
 
     return 0;
 }
+

@@ -58,11 +58,12 @@ class Mgr
 public:
     using PCard = std::shared_ptr<Card>;
     int match(const std::map<int, PCard> &hand, std::vector<CardGroup> &grouplist);
-    int pickRun(const std::map<int, PCard> &hand, std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates);
-    static int pickRunFromGroup(const CardGroup &group, std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates);
+    int buildRun(const std::map<int, PCard> &hand, std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates);
+    static int buildRunFromGroup(const CardGroup &group, std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates);
     static void printCardGroup(const CardGroup &group);
     static std::string getCardString(const Card &card);
-    static int pickHighestMeld(std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates);
+    static int buildMeld(std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates);
+    static int buildMeldFromGroup(std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates);
 private:
 
 public:
