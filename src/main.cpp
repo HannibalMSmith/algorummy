@@ -28,6 +28,12 @@ int main(int argc, char **argv)
     Mgr mgr;
     mgr.special_ = special.rank_;
     mgr.match(hand, groupList);
-
+    
+    cout<<"理牌结果#################"<<endl;
+    std::for_each(groupList.begin(), groupList.end(), [](const CardGroup &group)
+    {
+        Mgr::printCardGroup(group);
+    });
+    
     return 0;
 }

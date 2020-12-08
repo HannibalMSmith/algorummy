@@ -7,6 +7,7 @@
 const int c_suit = 5;
 const int c_rank = 13;
 const int c_minimum =3;
+const int c_idxerror=-1;
 enum E_SUIT
 {
     e_joker=0,
@@ -23,6 +24,7 @@ public:
     Card(E_SUIT suit, int rank, int goldrank);
     static int genId(){return ++idx;}
     bool special();
+    int getGoal();
 public:
     E_SUIT suit_;
     int rank_;
@@ -30,6 +32,7 @@ public:
     bool joker_;
     bool special_;
     bool magic_;
+    bool optional_;
 private:
     static int idx;    
 };
@@ -39,14 +42,17 @@ private:
 class CardGroup
 {
 public:
-    CardGroup(int id = genId()) : id_(id){}
+    CardGroup(int idxBuild = 0,int id = genId()) : idxBuild_(idxBuild), id_(id){}
     static int genId(){return ++idx;}
     using PCard = std::shared_ptr<Card>;
     void removeCard(const PCard &card);
     void removeGroup(const CardGroup &rhs);
     void reset();
+    int getGoal();
 public:
     int id_;
+    int idxBuild_;
+    int idxBuildValue_;
     std::vector<std::shared_ptr<Card>> cardlist_;   
 private:
     static int idx;    
@@ -63,7 +69,8 @@ public:
     static void printCardGroup(const CardGroup &group);
     static std::string getCardString(const Card &card);
     static int buildMeld(std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates);
-    static int buildMeldFromGroup(std::vector<CardGroup> &matchlist, std::vector<CardGroup> &candidates);
+    static int buildMeldFromGroup(CardGroup& group, CardGroup &potential);
+    static int buildSet(std::vector<CardGroup> &candidates, CardGroup& group, CardGroup &set);
 private:
 
 public:
