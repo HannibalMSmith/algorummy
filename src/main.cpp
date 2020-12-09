@@ -24,15 +24,21 @@ int main(int argc, char **argv)
     if(!init(script.c_str(), hand, special))
         return 1;
 
-    std::vector<CardGroup> groupList;
-    Mgr mgr;
-    mgr.special_ = special.rank_;
-    mgr.match(hand, groupList);
+    std::vector<CardGroup> runList;
+    std::vector<CardGroup> meldList;
+    std::vector<CardGroup> setList;
+    std::vector<CardGroup> unMatchedList;
+    GameRummy solution;
+    solution.special_ = special.rank_;
+    solution.match(hand, runList, meldList, setList, unMatchedList);
     
+    runList.insert(runList.end(), meldList.begin(), meldList.end());
+    runList.insert(runList.end(), setList.begin(), setList.end());
+    runList.insert(runList.end(), unMatchedList.begin(), unMatchedList.end());
     cout<<"理牌结果#################"<<endl;
-    std::for_each(groupList.begin(), groupList.end(), [](const CardGroup &group)
+    std::for_each(runList.begin(), runList.end(), [](const CardGroup &group)
     {
-        Mgr::printCardGroup(group);
+        GameRummy::printCardGroup(group);
     });
     
     return 0;

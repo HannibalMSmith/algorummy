@@ -45,7 +45,7 @@ bool init(const char *script, std::map<int, std::shared_ptr<Card>> &hand, Card &
     magic.suit_ = static_cast<E_SUIT>(root["magiccard"]["suit"].asInt());
     magic.rank_ = root["magiccard"]["rank"].asInt();
     
-    cout << "金牌：" << Mgr::getCardString(magic) << endl;
+    cout << "金牌：" << GameRummy::getCardString(magic) << endl;
 
     using PCard = shared_ptr<Card>;
     int size = root["hand"][0]["card"].size();
@@ -60,7 +60,7 @@ bool init(const char *script, std::map<int, std::shared_ptr<Card>> &hand, Card &
     cout<<"初始手牌"<<endl;
     for (auto item : hand)
     {
-        cout<<Mgr::getCardString(*(item.second));
+        cout<<GameRummy::getCardString(*(item.second));
         if (item.second->rank_ == magic.rank_)
         {
             cout<<" 金牌";
