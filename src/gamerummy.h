@@ -11,10 +11,10 @@ const int c_idxerror=-1;
 enum E_SUIT
 {
     e_joker=0,
-    e_spade,
-    e_heart,
     e_diamond,
-    e_club
+    e_club,
+    e_heart,
+    e_spade
 };
 
 class Card
@@ -36,8 +36,6 @@ private:
     static int idx;    
 };
 
-
-
 class CardGroup
 {
 public:
@@ -50,7 +48,8 @@ public:
     void removeGroup(const CardGroup &rhs);
     void reset();
     int getGoal();
-    int expandGroup(const PCard &card);
+    bool expandToGroup(const PCard &card);
+    bool expandToRun(const PCard &card);
 public:
     int id_;
     int idxSetMember_;
@@ -72,11 +71,13 @@ public:
     int buildRun(const std::map<int, PCard> &hand, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
     static int buildRunFromGroup(CardGroup &group, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
     static int buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &meldList,
-                                 std::vector<CardGroup> &setList, std::vector<CardGroup> &unMatchedList);
+                                 std::vector<CardGroup> &setList);
     static int buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &potential);
     static int buildSetFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &set);
+    static int markSet(std::vector<CardGroup> &candidates, CardGroup &group);
+    static bool tryBuildRunWithSpecial(CardGroup &specialGroup, CardGroup &meldCandidate, PCard &special);
     static int buildCandidates(std::vector<CardGroup> &runList, std::vector<CardGroup> &meldList, 
-                                std::vector<CardGroup> &setList, std::vector<CardGroup> &candidates, std::vector<CardGroup> &unMatchedList);
+                                std::vector<CardGroup> &setList, std::vector<CardGroup> &candidates);
 private:
     static void removeSetFromCandidates(std::vector<CardGroup> &candidates);
 public:

@@ -16,7 +16,7 @@ using std::vector;
 int Card::idx = 0;
 int CardGroup::idx = 0;
 
-Card::Card() : suit_(e_spade), rank_(0), id_(genId()), joker_(false)
+Card::Card() : suit_(e_spade), rank_(0), id_(genId()), joker_(suit_ == e_joker)
 {
     special_ = false;
     magic_ = suit_ == e_joker;
@@ -25,7 +25,7 @@ Card::Card() : suit_(e_spade), rank_(0), id_(genId()), joker_(false)
 Card::Card(E_SUIT suit, int rank, int goldrank) : suit_(suit), rank_(rank), id_(genId()), joker_(suit_ == e_joker)
 {
     special_ = rank_ == goldrank;
-    magic_ = suit_ == e_joker || special_;
+    magic_ = suit_ == e_joker;
 }
 
 int Card::getGoal()
@@ -81,26 +81,65 @@ int CardGroup::getGoal()
     return goal;
 }
 
-int CardGroup::expandGroup(const PCard &card)
+bool CardGroup::expandToRun(const PCard &card)
 {
-    int suit = cardlist_[0]->suit_;
-    if (suit != card->suit_)
+    if (card->suit_ != cardlist_[0]->suit_)
     {
-        return 0;
+        return false;
     }
 
     if (card->rank_ + 1 == (*cardlist_.begin())->rank_)
     {
         cardlist_.insert(cardlist_.begin(), card);
-        return 1;
+        return true;
     }
-
-    if (card->rank_ - 1 == (*cardlist_.begin())->rank_)
+    else if (card->rank_ - 1 == (*(cardlist_.end() - 1))->rank_)
     {
         cardlist_.insert(cardlist_.end(), card);
-        return 1;
+        return true;
     }
-    return 0;
+    else
+    {
+        return false;
+    }
+}
+
+bool CardGroup::expandToGroup(const PCard &card)
+{
+    if (card->special_)
+    {
+        if (expandToRun(card))
+        {
+            return true;
+        }
+    }
+    if (card->magic_)
+    {
+        assert(cardlist_.size() >= c_minimum - 1);
+        if (cardlist_[1]->rank_ - cardlist_[0]->rank_ == 0)
+        {
+            if (cardlist_.size() == c_minimum)
+            {
+                cardlist_.push_back(card);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (cardlist_[1]->rank_ - cardlist_[0]->rank_ == 1)
+        {
+            cardlist_.push_back(card);
+            return true;
+        }
+        else if (cardlist_[1]->rank_ - cardlist_[0]->rank_ == 2)
+        {
+            cardlist_.insert(cardlist_.begin() + 1, card);
+            return true;
+        }
+    }
+    return false;
 }
 
 void GameRummy::printCardGroup(const CardGroup &group)
@@ -181,41 +220,46 @@ int GameRummy::match(const std::map<int, PCard> &hand, std::vector<CardGroup> &r
     runList.clear();
     meldList.clear();
     setList.clear();
+    unMatchedList.clear();
     vector<CardGroup> candidates;
     buildRun(hand, runList, candidates);
-    buildMeldAndSet(candidates, meldList, setList, unMatchedList);
-
+    buildMeldAndSet(candidates, meldList, setList);
+    buildCandidates(runList, meldList, setList, candidates);
+    unMatchedList = candidates;
     return 0;
 }
 
 //按花色倒序分组
 int GameRummy::buildRun(const map<int, PCard> &hand, vector<CardGroup> &runList, vector<CardGroup> &candidates)
 {
-    runList.clear();
-    candidates.clear();
-    std::vector<CardGroup> suitlist;
-    suitlist.resize(c_suit);
+    std::vector<CardGroup> suitList;
+    suitList.resize(c_suit);
     candidates.resize(c_suit);
     std::for_each(hand.begin(), hand.end(),
-                  [&suitlist, &candidates, this](std::pair<const int, PCard> item) {
-                      if (item.second->rank_ == special_)
+                  [&suitList, &candidates, this](std::pair<const int, PCard> item) {
+                      if (item.second->special_ || item.second->magic_)
                       {
                           candidates[e_joker].cardlist_.push_back(item.second);
                       }
                       else
                       {
-                          suitlist[item.second->suit_].cardlist_.push_back(item.second);
+                          suitList[item.second->suit_].cardlist_.push_back(item.second);
                       }
-                  });
+                  });             
 
-    std::for_each(suitlist.begin(), suitlist.end(),
+    std::for_each(suitList.begin(), suitList.end(),
                   [&runList, &candidates](CardGroup &group) {
                       std::sort(group.cardlist_.begin(), group.cardlist_.end(), [](const PCard &a, const PCard &b) { return a->rank_ > b->rank_; });
                       buildRunFromGroup(group, runList, candidates);
                   });
 
-    // cout << "同花组" << endl;
-    // std::for_each(runList.begin(), runList.end(), GameRummy::printCardGroup);
+#ifdef Debug                  
+    {
+        cout << "同花组#######################" << endl;
+        std::for_each(runList.begin(), runList.end(), GameRummy::printCardGroup);
+        cout << "同花组#######################" << endl;
+    }
+#endif
 
     return 0;
 }
@@ -225,13 +269,17 @@ int GameRummy::buildRunFromGroup(CardGroup &group, vector<CardGroup> &runList, v
 {
     int matched = 0;
     int groupSize = group.cardlist_.size();
-    if (groupSize < c_minimum && groupSize > 0)
+    if(groupSize == 0)
+    {
+        return 0;
+    }
+    else if (groupSize < c_minimum && groupSize > 0)
     {
         int idx = group.cardlist_[0]->suit_;
         assert(idx >= 0 && idx <= 4);
         candidates[idx].cardlist_.insert(candidates[idx].cardlist_.end(),
                                          group.cardlist_.begin(), group.cardlist_.end());
-        return matched;
+        return 0;
     }
 
     CardGroup tmpMatched;
@@ -301,24 +349,26 @@ int GameRummy::buildRunFromGroup(CardGroup &group, vector<CardGroup> &runList, v
         candidates[idx].cardlist_.insert(candidates[idx].cardlist_.end(),
                                          group.cardlist_.begin(), group.cardlist_.end());
     }
-    return matched;
+    return 1;
 }
 
 void GameRummy::removeSetFromCandidates(std::vector<CardGroup> &candidates)
 {
-    std::for_each(candidates.begin(), candidates.end(), [](CardGroup &group) {
-        int idx = group.idxSetMember_;
-        if (idx != c_idxerror)
-        {
-            group.cardlist_.erase(group.cardlist_.begin() + idx);
-            group.idxSetMember_ = c_idxerror;
-        }
-    });
+    int i = 0;
+    std::for_each(candidates.begin(), candidates.end(),
+                  [&i](CardGroup &group) {
+                      int idx = group.idxSetMember_;
+                      if (idx != c_idxerror)
+                      {
+                          group.cardlist_.erase(group.cardlist_.begin() + idx);
+                          group.idxSetMember_ = c_idxerror;
+                      }
+                  });
 }
 
 //从候选组选出最高得分的顺子或者套牌
 int GameRummy::buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &meldList,
-                               std::vector<CardGroup> &setList, std::vector<CardGroup> &unMatchedList)
+                               std::vector<CardGroup> &setList)
 {
     std::for_each(candidates.begin(), candidates.end(), [](CardGroup &group) {
         std::sort(group.cardlist_.begin(), group.cardlist_.end(),
@@ -329,153 +379,152 @@ int GameRummy::buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<C
 
     while (true)
     {
-        std::vector<int> targetGoal;
-        targetGoal.resize(c_suit);
-        CardGroup set;
-        CardGroup meld;
-        int setGoal = 0;
-        int meldGoal = 0;
 
-
-        cout << "候选组#######################" << endl;
-        std::for_each(candidates.begin(), candidates.end(), GameRummy::printCardGroup);
-
-
-        for (size_t i = 1; i < c_suit; i++)
+#ifdef Debug        
         {
-            setGoal = buildSetFromTop(candidates, candidates[i], set);
-            meldGoal = buildMeldFromTop(candidates, candidates[i], meld);
+            cout << "候选组#######################" << endl;
+            std::for_each(candidates.begin(), candidates.end(), GameRummy::printCardGroup);
+            cout << "候选组#######################" << endl;
+        }
+#endif        
+
+        vector<CardGroup> tempSetList;
+        vector<CardGroup> tempMeldList;
+        vector<int> targetGoal;
+        tempSetList.resize(c_suit);
+        tempMeldList.resize(c_suit);
+        targetGoal.resize(c_suit);
+
+        for (auto idx = 1; idx < c_suit; ++idx)
+        {
+            int setGoal = buildSetFromTop(candidates, candidates[idx], tempSetList[idx]);
+            int meldGoal = buildMeldFromTop(candidates, candidates[idx], tempMeldList[idx]);
             if (meldGoal > setGoal)
             {
-                targetGoal[i] = meldGoal;
+                targetGoal[idx] = meldGoal;
             }
             else
             {
-                targetGoal[i] = setGoal;
-            }
-
-            if (setGoal == 0 && meldGoal == 0)
-            {
-                if (candidates[i].cardlist_.size() > 0)
-                {
-                    candidates[i].cardlist_.erase(candidates[i].cardlist_.begin());
-                }
+                targetGoal[idx] = setGoal;
             }
         }
 
-
-        cout << "匹配组#####################" << endl;
-        cout << "set分数：" << setGoal << " meld分数：" << meldGoal << endl;
-        cout << "Set#####################" << endl;
-        printCardGroup(set);
-        cout << "meld#####################" << endl;
-        printCardGroup(meld);
-
-
         auto itMax = std::max_element(targetGoal.begin(), targetGoal.end());
         if (*itMax == 0)
-        {
-            // for (int i = 1; i < c_suit; i++)
-            // {
-            //     if (candidates[i].cardlist_.size() == 0)
-            //     {
-            //         continue;
-            //     }
-            //     candidates[i].cardlist_.erase(candidates[i].cardlist_.begin());
-            // }
+        {   
+            
             if (candidates[1].cardlist_.size() == 0 && candidates[2].cardlist_.size() == 0 &&
                 candidates[3].cardlist_.size() == 0 && candidates[4].cardlist_.size() == 0)
             {
+#ifdef Debug                 
+                {
+                    cout << "套牌与顺子匹配结束##########" << endl;
+                }
+#endif                
                 break;
             }
         }
 
         int idxGroup = itMax - targetGoal.begin();
-
-        if (set.cardlist_.size() > c_minimum)
+        if (tempSetList[idxGroup].getGoal() > 0)
         {
+            //fix me need better bookkeep
+            markSet(candidates, candidates[idxGroup]);
+        }
 
-            if (meldGoal > 0)
+        int setSize = tempSetList[idxGroup].cardlist_.size();
+
+        if (setSize > c_minimum)
+        {
+            //套牌与潜在顺子重合
+            if (meldList[idxGroup].getGoal() > 0)
             {
-                int rank = set.cardlist_[0]->rank_;
-                auto itCard = std::find_if(meld.cardlist_.begin(), meld.cardlist_.end(),
+                int rank = tempSetList[idxGroup].cardlist_[0]->rank_;
+                auto itCard = std::find_if(tempMeldList[idxGroup].cardlist_.begin(), tempMeldList[idxGroup].cardlist_.end(),
                                            [rank](const PCard &card) { return card->rank_ == rank; });
-                set.removeCard((*itCard)->id_);
-                setList.push_back(set);
-
-                cout << "四张牌+匹配顺子：" << rank << endl;
-
-                candidates[idxGroup].removeGroup(meld);
+                tempSetList[idxGroup].removeCard((*itCard)->id_);
+                setList.push_back(tempSetList[idxGroup]);
+                candidates[idxGroup].removeGroup(tempMeldList[idxGroup]);
                 candidates[idxGroup].idxSetMember_ = c_idxerror;
-                meld.cardlist_.push_back(candidates[0].cardlist_[0]);
-                candidates[0].cardlist_.erase(candidates[0].cardlist_.begin());
-                meldList.push_back(meld);
                 removeSetFromCandidates(candidates);
+
+                candidates[idxGroup].removeGroup(tempMeldList[idxGroup]);
+                PCard special;
+                if (tryBuildRunWithSpecial(candidates[0], tempMeldList[idxGroup], special))
+                {
+                    tempMeldList[idxGroup].cardlist_.push_back(special);
+                    meldList.push_back(tempMeldList[idxGroup]);
+                    candidates[0].removeCard(special);
+                }
+                else
+                {
+                    tempMeldList[idxGroup].cardlist_.push_back(candidates[0].cardlist_[0]);
+                    meldList.push_back(tempMeldList[idxGroup]);
+                    candidates[0].cardlist_.erase(candidates[0].cardlist_.begin());
+                }
             }
             else
             {
-                cout << "四张牌：" << set.cardlist_[0]->rank_ << endl;
-                setList.push_back(set);
+                setList.push_back(tempSetList[idxGroup]);
                 removeSetFromCandidates(candidates);
             }
         }
-        else if (set.cardlist_.size() == c_minimum)
+        else if (setSize == c_minimum)
         {
-
-            cout << "删除前候选组：" << endl;
-            std::for_each(candidates.begin(), candidates.end(), GameRummy::printCardGroup);
-
-            setList.push_back(set);
+            setList.push_back(tempSetList[idxGroup]);
             removeSetFromCandidates(candidates);
-
-            cout << "匹配套牌三张：" << set.cardlist_[0]->rank_ << endl;
-            cout << "删除后候选组：" << endl;
-            std::for_each(candidates.begin(), candidates.end(), GameRummy::printCardGroup);
-
         }
-        else if (set.cardlist_.size() == c_minimum - 1)
+        else if (setSize == c_minimum - 1)
         {
-            cout << "匹配套牌二张：" << set.cardlist_[0]->rank_ << endl;
-            set.cardlist_.push_back(candidates[0].cardlist_[0]);
+            tempSetList[idxGroup].cardlist_.push_back(candidates[0].cardlist_[0]);
             candidates[0].cardlist_.erase(candidates[0].cardlist_.begin());
-            setList.push_back(set);
+            setList.push_back(tempSetList[idxGroup]);
             removeSetFromCandidates(candidates);
         }
         else
         {
-            cout << "匹配套牌顺子：" << meld.cardlist_[0]->rank_ << endl;
-            candidates[idxGroup].removeGroup(meld);
-            meld.cardlist_.push_back(candidates[0].cardlist_[0]);
-            candidates[0].cardlist_.erase(candidates[0].cardlist_.begin());
-            meldList.push_back(meld);
+            candidates[idxGroup].removeGroup(tempMeldList[idxGroup]);
+            PCard special;
+            if (tryBuildRunWithSpecial(candidates[0], tempMeldList[idxGroup], special))
+            {
+                tempMeldList[idxGroup].cardlist_.push_back(special);
+                meldList.push_back(tempMeldList[idxGroup]);
+                candidates[0].removeCard(special);
+            }
+            else
+            {
+                tempMeldList[idxGroup].cardlist_.push_back(candidates[0].cardlist_[0]);
+                meldList.push_back(tempMeldList[idxGroup]);
+                candidates[0].cardlist_.erase(candidates[0].cardlist_.begin());
+            }
         }
     }
-
     return 0;
 }
 
 //选出同花色潜在顺子
-int GameRummy::buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &potential)
+int GameRummy::buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &meld)
 {
     if (group.cardlist_.size() < c_minimum - 1 || candidates[0].cardlist_.size() == 0)
     {
         return 0;
     }
-    potential.reset();
+    meld.reset();
     auto it = group.cardlist_.begin();
     if ((*it)->rank_ - (*(it + 1))->rank_ == 1 || (*it)->rank_ - (*(it + 1))->rank_ == 2)
     {
-        potential.cardlist_.push_back(*it);
-        potential.cardlist_.push_back(*(it + 1));
-        return potential.getGoal();
+        meld.cardlist_.push_back(*it);
+        meld.cardlist_.push_back(*(it + 1));
+        return meld.getGoal();
     }
     else if ((*it)->rank_ - (*(it + 1))->rank_ == 0)
     {
         ++it;
         const PCard sameRank = (*(group.cardlist_.begin()));
         group.cardlist_.erase(group.cardlist_.begin());
-        return buildMeldFromTop(candidates, group, potential);
-        return potential.getGoal();
+        buildMeldFromTop(candidates, group, meld);
+        group.cardlist_.insert(group.cardlist_.begin(), sameRank);
+        return meld.getGoal();
     }
     else
     {
@@ -486,6 +535,7 @@ int GameRummy::buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &g
 //选出潜在套牌
 int GameRummy::buildSetFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &set)
 {
+    set.reset();
     if (group.cardlist_.size() == 0)
     {
         return 0;
@@ -498,79 +548,128 @@ int GameRummy::buildSetFromTop(std::vector<CardGroup> &candidates, CardGroup &gr
                       if (itCard != group.cardlist_.end())
                       {
                           tempSet.cardlist_.push_back(*itCard);
-                          group.idxSetMember_ = itCard - group.cardlist_.begin();
                       }
                   });
 
     int nMember = tempSet.cardlist_.size();
     if (nMember < c_minimum - 1)
     {
-        std::for_each(candidates.begin(), candidates.end(), [](CardGroup &group) { group.idxSetMember_ = c_idxerror; });
         return 0;
     }
-    if (nMember == c_minimum - 1)
+    else if (nMember == c_minimum - 1)
     {
         if (candidates[0].cardlist_.size() == 0)
         {
-            std::for_each(candidates.begin(), candidates.end(), [](CardGroup &group) { group.idxSetMember_ = c_idxerror; });
             return 0;
         }
         else
         {
-            candidates[0].cardlist_.erase(candidates[0].cardlist_.begin());
+            set = std::move(tempSet);
             return set.getGoal();
         }
     }
-    if (nMember > c_minimum)
+    else
     {
-        std::for_each(candidates.begin(), candidates.end(), [](CardGroup &group) { group.optional_ = true; });
+        set = std::move(tempSet);
+        return set.getGoal();
     }
-    set = std::move(tempSet);
-    return set.getGoal();
+}
+
+int GameRummy::markSet(std::vector<CardGroup> &candidates, CardGroup &group)
+{
+    int rank = group.cardlist_[0]->rank_;
+    CardGroup tempSet;
+    std::for_each(candidates.begin(), candidates.end(),
+                  [&tempSet, rank](CardGroup &group) {
+                      auto itCard = std::find_if(group.cardlist_.begin(), group.cardlist_.end(), [rank](PCard &card) { return card->rank_ == rank; });
+                      if (itCard != group.cardlist_.end())
+                      {
+                          tempSet.cardlist_.push_back(*itCard);
+                          group.idxSetMember_ = itCard - group.cardlist_.begin();
+                      }
+                  });
+}
+
+bool GameRummy::tryBuildRunWithSpecial(CardGroup &specialGroup, CardGroup &meldCandidate, PCard &special)
+{
+    std::for_each(specialGroup.cardlist_.begin(), specialGroup.cardlist_.end(),
+                  [&meldCandidate, &special](const PCard &card) {
+                      if (meldCandidate.expandToGroup(card))
+                      {
+                          special = card;
+                          return true;
+                      }
+                  });
+    return false;
 }
 
 int GameRummy::buildCandidates(std::vector<CardGroup> &runList, std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList,
-                               std::vector<CardGroup> &candidates, std::vector<CardGroup> &unMatchedList)
+                               std::vector<CardGroup> &candidates)
 {
-    std::sort(candidates[0].cardlist_.begin(), candidates[0].cardlist_.end(), [](const PCard &a, const PCard &b) { return a > b; });
-    if (candidates[0].cardlist_.size() == 0)
+    int nMagic = candidates[0].cardlist_.size();
+    if (nMagic == 0)
     {
         return 0;
     }
-    else
+    std::sort(candidates[0].cardlist_.begin(), candidates[0].cardlist_.end(), [](const PCard &a, const PCard &b) { return a > b; });
+    vector<int> goalList(c_minimum);
+    for (auto idx = 1; idx != c_minimum; ++idx)
     {
-        if (candidates[0].cardlist_[0]->rank_ != 0)
+        if (candidates[idx].cardlist_.size() != 0)
         {
-            PCard special = candidates[0].cardlist_[0];
-            std::for_each(runList.begin(), runList.end(), [&candidates, &special](CardGroup &group) {
-                if (group.expandGroup(special))
-                {
-                    candidates[0].cardlist_.erase(candidates[0].cardlist_.begin());
-                }
-            });
+            goalList[idx] = candidates[idx].cardlist_[0]->rank_;
         }
-        CardGroup unMatchedGroup;
-        std::for_each(unMatchedList.begin(), unMatchedList.end(), [&unMatchedGroup](const CardGroup &group) {
-            unMatchedGroup.cardlist_.insert(unMatchedGroup.cardlist_.begin(), group.cardlist_.begin(), group.cardlist_.end());
-        });
-        std::sort(unMatchedGroup.cardlist_.begin(), unMatchedGroup.cardlist_.end(), [](const PCard &a, const PCard &b) { return a->rank_ > b->rank_; });
-
-        if (candidates[0].cardlist_.size() == 3)
+        else
         {
-            //todo special data
-            unMatchedList.clear();
-            unMatchedList.push_back(candidates[0]);
-            unMatchedList.push_back(unMatchedGroup);
-        }
-        else if (candidates[0].cardlist_.size() == 2)
-        {
-            unMatchedList.clear();
-            CardGroup newGroup;
-            newGroup.cardlist_.push_back(unMatchedGroup.cardlist_[0]);
-            unMatchedList.push_back(newGroup);
-            unMatchedGroup.cardlist_.erase(unMatchedGroup.cardlist_.begin());
-            unMatchedList.push_back(unMatchedGroup);
+            goalList[idx] = 0;
         }
     }
+
+    auto itMax = std::max_element(goalList.begin() + 1, goalList.end());
+    int idxMax = itMax - goalList.begin();
+    if (nMagic == 1)
+    {
+        std::for_each(meldList.begin(), meldList.end(), [&candidates, &meldList](CardGroup &group) {
+            group.expandToGroup(*(candidates[0].cardlist_.begin()));
+        });
+        std::for_each(setList.begin(), setList.end(), [&candidates, &meldList](CardGroup &group) {
+            group.expandToGroup(*(candidates[0].cardlist_.begin()));
+        });
+    }
+    else if (nMagic == 2)
+    {
+        CardGroup newGroup = candidates[0];
+        newGroup.cardlist_.insert(newGroup.cardlist_.begin(), candidates[idxMax].cardlist_[0]);
+        candidates[idxMax].cardlist_.erase(candidates[idxMax].cardlist_.begin());
+    }
+    else
+    {
+        //extreme condition should test more
+        do
+        {
+            nMagic -= 2;
+            goalList.erase(goalList.begin() + idxMax);
+            candidates[0].cardlist_.erase(candidates[0].cardlist_.begin(), candidates[0].cardlist_.begin()+2);
+            if (nMagic >= 2)
+            {
+                itMax = std::max_element(goalList.begin() + 1, goalList.end());
+                idxMax = itMax - goalList.begin();
+                CardGroup newGroup = candidates[0];
+                newGroup.cardlist_.insert(newGroup.cardlist_.begin(), candidates[idxMax].cardlist_[0]);
+                candidates[idxMax].cardlist_.erase(candidates[idxMax].cardlist_.begin());
+            }
+            else if (nMagic == 1)
+            {
+                std::for_each(meldList.begin(), meldList.end(), [&candidates, &meldList](CardGroup &group) {
+                    group.expandToGroup(*(candidates[0].cardlist_.begin()));
+                });
+                std::for_each(setList.begin(), setList.end(), [&candidates, &meldList](CardGroup &group) {
+                    group.expandToGroup(*(candidates[0].cardlist_.begin()));
+                });
+            }
+
+        } while (nMagic > 0);
+    }
+
     return 0;
 }

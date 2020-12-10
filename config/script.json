@@ -12,18 +12,18 @@
         {
             "player" : 0,
             "card": [
-                {"suit" : 4, "rank" : 7},
-                {"suit" : 4, "rank" : 8},
-                {"suit" : 4, "rank" : 9},
-                {"suit" : 4, "rank" : 10},
-                {"suit" : 4, "rank" : 11},
-                {"suit" : 4, "rank" : 12},
-                {"suit" : 3, "rank" : 6},
-                {"suit" : 3, "rank" : 7},
-                {"suit" : 3, "rank" : 7},
-                {"suit" : 3, "rank" : 10},
+                {"suit" : 2, "rank" : 7},
+                {"suit" : 2, "rank" : 8},
+                {"suit" : 2, "rank" : 9},
                 {"suit" : 2, "rank" : 10},
+                {"suit" : 2, "rank" : 11},
+                {"suit" : 2, "rank" : 12},
+                {"suit" : 1, "rank" : 6},
+                {"suit" : 1, "rank" : 7},
+                {"suit" : 1, "rank" : 7},
                 {"suit" : 1, "rank" : 10},
+                {"suit" : 4, "rank" : 10},
+                {"suit" : 3, "rank" : 10},
                 {"suit" : 0, "rank" : 0}
             ]
         }
