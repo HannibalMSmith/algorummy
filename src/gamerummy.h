@@ -41,7 +41,8 @@ private:
 class CardGroup
 {
 public:
-    CardGroup(int idxSetMember=c_idxerror, bool opotional=false, int id = genId()) : idxSetMember_(idxSetMember), optional_(opotional), id_(id){}
+    CardGroup(int idxSetMember=c_idxerror, bool opotional=false, int id = genId()) 
+    : idxSetMember_(idxSetMember), optional_(opotional), id_(id){}
     static int genId(){return ++idx;}
     using PCard = std::shared_ptr<Card>;
     void removeCard(const PCard &card);
@@ -66,14 +67,16 @@ public:
     using PCard = std::shared_ptr<Card>;
     static void printCardGroup(const CardGroup &group);
     static std::string getCardString(const Card &card);
-    int match(const std::map<int, PCard> &hand, std::vector<CardGroup> &runList, std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList, std::vector<CardGroup> &unMatchedList);
+    int match(const std::map<int, PCard> &hand, std::vector<CardGroup> &runList, 
+                std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList, std::vector<CardGroup> &unMatchedList);
     int buildRun(const std::map<int, PCard> &hand, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
     static int buildRunFromGroup(CardGroup &group, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
-    static int buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList);
+    static int buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &meldList,
+                                 std::vector<CardGroup> &setList, std::vector<CardGroup> &unMatchedList);
     static int buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &potential);
     static int buildSetFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &set);
-    static int buildCandidates(std::vector<CardGroup> &runList, std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList, 
-                                std::vector<CardGroup> &candidates, std::vector<CardGroup> &unMatchedList);
+    static int buildCandidates(std::vector<CardGroup> &runList, std::vector<CardGroup> &meldList, 
+                                std::vector<CardGroup> &setList, std::vector<CardGroup> &candidates, std::vector<CardGroup> &unMatchedList);
 private:
     static void removeSetFromCandidates(std::vector<CardGroup> &candidates);
 public:

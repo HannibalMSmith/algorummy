@@ -10,9 +10,7 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
     )
 endif()
 
-project(Rummy VERSION 1.0.0.1)
-
-configure_file("${CMAKE_SOURCE_DIR}/src/RummyConfig.h.in" "${CMAKE_SOURCE_DIR}/src/RummyConfig.h")
+project(Rummy)
 
 include_directories(
     "${CMAKE_SOURCE_DIR}/inc"

@@ -1,5 +1,4 @@
 #include "init.h"
-#include "RummyConfig.h"
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -14,8 +13,6 @@ const char *scriptPrompt(int argc, char **argv)
 {
     if (argc < 2)
     {
-        cout << "Rummy" << Rummy_VERSION_MAJOR << "." << Rummy_VERSION_MINOR << "."
-             << Rummy_VERSION_MAJOR << "." << Rummy_VERSION_MAJOR << endl;
         cout << "Usage: " << argv[0] << " PathToScript(default ./config/script.json)" << endl;
     }
     const char *scriptfile = "./config/script.json";
