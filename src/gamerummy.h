@@ -48,7 +48,7 @@ public:
     void removeGroup(const CardGroup &rhs);
     void reset();
     int getGoal();
-    bool expandToGroup(const PCard &card);
+    bool expandToMeld(const PCard &card);
     bool expandToRun(const PCard &card);
 public:
     int id_;
@@ -78,6 +78,9 @@ public:
     static bool tryBuildRunWithSpecial(CardGroup &specialGroup, CardGroup &meldCandidate, PCard &special);
     static int buildCandidates(std::vector<CardGroup> &runList, std::vector<CardGroup> &meldList, 
                                 std::vector<CardGroup> &setList, std::vector<CardGroup> &candidates);
+    static int getMaxCandidate(std::vector<CardGroup> &candidates, PCard &card);
+    static bool expandToRunAndDelSource(std::vector<CardGroup> &runList, CardGroup &src);
+    static bool expandToMeldAndDelSource(std::vector<CardGroup> &targetList, CardGroup &src, int idx);                            
 private:
     static void removeSetFromCandidates(std::vector<CardGroup> &candidates);
 public:
