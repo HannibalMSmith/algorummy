@@ -74,7 +74,7 @@ public:
                                  std::vector<CardGroup> &setList);
     static int buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &potential);
     static int buildSetFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &set);
-    static int markSet(std::vector<CardGroup> &candidates, CardGroup &group);
+    static void markSet(std::vector<CardGroup> &candidates, CardGroup &group);
     static bool tryBuildRunWithSpecial(CardGroup &specialGroup, CardGroup &meldCandidate, PCard &special);
     static int buildCandidates(std::vector<CardGroup> &runList, std::vector<CardGroup> &meldList, 
                                 std::vector<CardGroup> &setList, std::vector<CardGroup> &candidates);

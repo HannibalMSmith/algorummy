@@ -35,7 +35,7 @@ bool init(const char *script, std::map<int, std::shared_ptr<Card>> &hand, Card &
     JSONCPP_STRING errs;
     if (!parseFromStream(builder, ifs, &root, &errs))
     {
-        cout << "script file format error" << endl;
+        cout << "Please check the json file format" << endl;
         return false;
     }
 

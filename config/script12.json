@@ -12,9 +12,9 @@
         {
             "player" : 0,
             "card": [
-                {"suit" : 4, "rank" : 7},
-                {"suit" : 4, "rank" : 8},
                 {"suit" : 4, "rank" : 9},
+                {"suit" : 4, "rank" : 10},
+                {"suit" : 4, "rank" : 11},
                 {"suit" : 4, "rank" : 10},
                 {"suit" : 4, "rank" : 11},
                 {"suit" : 4, "rank" : 12},
