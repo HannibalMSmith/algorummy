@@ -4,11 +4,12 @@ set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_BUILD_TYPE RelWithDebInfo)
 #set(CMAKE_BUILD_TYPE Release)
 
-if (CMAKE_BUILD_TYPE STREQUAL Debug)
+if (CMAKE_BUILD_TYPE STREQUAL Debug )
     add_definitions(
-        -DDebug
+        -DDebug -DDebugMore
     )
 endif()
+
 
 project(Rummy)
 
