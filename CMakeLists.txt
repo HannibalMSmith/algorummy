@@ -30,7 +30,7 @@ target_link_libraries(${PROJECT_NAME} jsoncpp_static)
 add_custom_command( 
           TARGET ${PROJECT_NAME} 
           POST_BUILD 
-          COMMAND echo "Attention ${CMAKE_SOURCE_DIR}/${PROJECT_NAME} is coming!"
+          COMMAND echo "${CMAKE_SOURCE_DIR}/${PROJECT_NAME}"
 )
 
 

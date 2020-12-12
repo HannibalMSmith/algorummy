@@ -70,17 +70,17 @@ public:
                 std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList, std::vector<CardGroup> &unMatchedList);
     int buildRun(const std::map<int, PCard> &hand, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
     static int buildRunFromGroup(CardGroup &group, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
-    static int buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &meldList,
-                                 std::vector<CardGroup> &setList);
+    static int buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &runList,
+                               std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList);
     static int buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &potential);
     static int buildSetFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &set);
     static void markSet(std::vector<CardGroup> &candidates, CardGroup &group);
-    static bool tryBuildRunWithSpecial(CardGroup &specialGroup, CardGroup &meldCandidate, PCard &special);
+    static bool tryBuildRunWithSpecial(CardGroup &specialGroup, CardGroup &meldCandidate, CardGroup &newGroup, PCard &special);
     static int buildCandidates(std::vector<CardGroup> &runList, std::vector<CardGroup> &meldList, 
                                 std::vector<CardGroup> &setList, std::vector<CardGroup> &candidates);
     static int getMaxCandidate(std::vector<CardGroup> &candidates, PCard &card);
     static bool expandToRunAndDelSource(std::vector<CardGroup> &runList, CardGroup &src);
-    static bool expandToMeldAndDelSource(std::vector<CardGroup> &targetList, CardGroup &src, int idx);                            
+    static bool expandToMeldAndDelSource(std::vector<CardGroup> &targetList, CardGroup &src, int idx = 0);                            
 private:
     static void removeSetFromCandidates(std::vector<CardGroup> &candidates);
 public:

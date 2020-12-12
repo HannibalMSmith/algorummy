@@ -40,6 +40,5 @@ int main(int argc, char **argv)
     {
         GameRummy::printCardGroup(group);
     });
-    
     return 0;
 }
