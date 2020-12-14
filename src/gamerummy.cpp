@@ -273,7 +273,7 @@ int GameRummy::buildRun(const map<int, PCard> &hand, vector<CardGroup> &runList,
                       buildRunFromGroup(group, runList, candidates);
                   });
 
-#ifdef Debug
+#ifdef DebugMore
     {
         cout << "初选同花组***********************" << endl;
         std::for_each(runList.begin(), runList.end(), GameRummy::printCardGroup);
@@ -287,7 +287,6 @@ int GameRummy::buildRun(const map<int, PCard> &hand, vector<CardGroup> &runList,
 //选取最大同花顺
 int GameRummy::buildRunFromGroup(CardGroup &group, vector<CardGroup> &runList, vector<CardGroup> &candidates)
 {
-    int matched = 0;
     int groupSize = group.cardlist_.size();
     if (groupSize == 0)
     {
@@ -428,7 +427,7 @@ int GameRummy::buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<C
     while (true)
     {
 
-#ifdef Debug
+#ifdef DebugMore
         {
             cout << "候选组#######################" << endl;
             std::for_each(candidates.begin(), candidates.end(), GameRummy::printCardGroup);
@@ -468,7 +467,6 @@ int GameRummy::buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<C
 
         if (*itMaxMeld == *itMax)
         {
-            assert(idxGroup == idxMeld);
             candidates[idxGroup].removeGroup(tempMeldList[idxGroup]);
             CardGroup newGroup;
             PCard special;
@@ -645,10 +643,17 @@ bool GameRummy::tryBuildRunWithSpecial(CardGroup &specialGroup, CardGroup &meldC
 
 int GameRummy::getMaxCandidate(std::vector<CardGroup> &candidates, PCard &card)
 {
-    vector<int> goalList(c_minimum);
-    for (auto idx = 1; idx != c_minimum; ++idx)
+    vector<int> goalList(c_suit);
+    for (auto idx = 1; idx != c_suit; ++idx)
     {
-        goalList[idx] = candidates[idx].cardlist_[0]->rank_;
+        if (candidates[idx].cardlist_.size() == 0)
+        {
+            goalList[idx] = 0;
+        }
+        else
+        {
+           goalList[idx] = candidates[idx].cardlist_[0]->rank_;
+        } 
     }
 
     auto itMax = std::max_element(goalList.begin() + 1, goalList.end());
