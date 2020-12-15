@@ -24,7 +24,6 @@ public:
     Card(E_SUIT suit, int rank, int goldrank);
     static int genId(){return ++idx;}
     bool special();
-    int getGoal();
 public:
     E_SUIT suit_;
     int rank_;
@@ -39,7 +38,7 @@ private:
 class CardGroup
 {
 public:
-    CardGroup(int idxSetMember=c_idxerror, bool opotional=false, int id = genId()) 
+    CardGroup(int id = genId(), int idxSetMember=c_idxerror, bool opotional=false) 
     : idxSetMember_(idxSetMember), optional_(opotional), id_(id){}
     static int genId(){return ++idx;}
     using PCard = std::shared_ptr<Card>;
@@ -75,7 +74,11 @@ public:
     static int buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &potential);
     static int buildSetFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &set);
     static void markSet(std::vector<CardGroup> &candidates, CardGroup &group);
+    static void buildRunOrMeld(std::vector<CardGroup> &candidates, std::vector<CardGroup> &runList,
+                               std::vector<CardGroup> &meldList, CardGroup &group, int idxInCandidates);
     static bool tryBuildRunWithSpecial(CardGroup &specialGroup, CardGroup &meldCandidate, CardGroup &newGroup, PCard &special);
+    static bool findCardInBothMeldandSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &meldList, int rank, PCard &card, int &idxCandidates);
+    static int buildMeldWithRank(std::vector<CardGroup> &candidates, CardGroup &group, int rank);
     static int buildCandidates(std::vector<CardGroup> &runList, std::vector<CardGroup> &meldList, 
                                 std::vector<CardGroup> &setList, std::vector<CardGroup> &candidates);
     static int getMaxCandidate(std::vector<CardGroup> &candidates, PCard &card);

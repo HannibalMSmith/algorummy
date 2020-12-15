@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 if (CMAKE_BUILD_TYPE STREQUAL Debug )
     add_definitions(
-        -DDebug -DDebugMore
+        -DDEBUG -DDEBUGMORE
     )
 endif()
 

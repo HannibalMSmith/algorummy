@@ -24,6 +24,19 @@ int main(int argc, char **argv)
     if(!init(script.c_str(), hand, special))
         return 1;
 
+    cout << "####################金牌：" << GameRummy::getCardString(special) << endl;
+    cout<<"#################初始手牌: "<<hand.size()<<endl;
+    for (auto item : hand)
+    {
+        cout<<GameRummy::getCardString(*(item.second));
+        if (item.second->rank_ == special.rank_)
+        {
+            cout<<" 金";
+        }
+        cout<<endl; 
+    }
+    cout<<"########################"<<hand.size()<<endl;    
+
     std::vector<CardGroup> runList;
     std::vector<CardGroup> meldList;
     std::vector<CardGroup> setList;
@@ -35,7 +48,13 @@ int main(int argc, char **argv)
     runList.insert(runList.end(), meldList.begin(), meldList.end());
     runList.insert(runList.end(), setList.begin(), setList.end());
     runList.insert(runList.end(), unMatchedList.begin(), unMatchedList.end());
-    cout<<"理牌结果#################"<<endl;
+
+    int count = 0;
+    std::for_each(runList.begin(), runList.end(), [&count](const CardGroup &item){
+        count += item.cardlist_.size();
+    });
+
+    cout<<"#################理牌结果："<<count<<endl;
     std::for_each(runList.begin(), runList.end(), [](const CardGroup &group)
     {
         GameRummy::printCardGroup(group);

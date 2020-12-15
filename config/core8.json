@@ -5,27 +5,27 @@
     "d":"4 黑桃",
     "e":"0 王",
     "magiccard":{
-        "suit":2,
-        "rank":8
+        "suit":1,
+        "rank":3
     },
     "hand":[
         {
             "player" : 0,
             "card": [
-                {"suit" : 2, "rank" : 2},
+                {"suit" : 1, "rank" : 3},
+                {"suit" : 2, "rank" : 1},
+                {"suit" : 2, "rank" : 7},
+                {"suit" : 4, "rank" : 8},
+                {"suit" : 1, "rank" : 2},
+                {"suit" : 1, "rank" : 4},
+                {"suit" : 1, "rank" : 8},
                 {"suit" : 2, "rank" : 4},
                 {"suit" : 2, "rank" : 7},
                 {"suit" : 2, "rank" : 8},
-                {"suit" : 3, "rank" : 7},
                 {"suit" : 3, "rank" : 8},
-                {"suit" : 3, "rank" : 13},
-                {"suit" : 1, "rank" : 8},
-                {"suit" : 2, "rank" : 12},
-                {"suit" : 3, "rank" : 11},
-                {"suit" : 4, "rank" : 7},
-                {"suit" : 4, "rank" : 8},
+                {"suit" : 4, "rank" : 1},
+                {"suit" : 4, "rank" : 10},
                 {"suit" : 4, "rank" : 11},
-                {"suit" : 4, "rank" : 13},
             ]
         }
     ]
