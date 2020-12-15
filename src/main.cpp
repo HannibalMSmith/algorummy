@@ -15,14 +15,18 @@ int main(int argc, char **argv)
     using std::map;
     using std::vector;
     using std::string;
-
-    string script = scriptPrompt(argc, argv);
-
     using PCard = shared_ptr<Card>;
+
+    int numCount = 0;
+    Card special = NULL;
     map<int, PCard> hand;
-    Card special;
-    if(!init(script.c_str(), hand, special))
+    string script = scriptPrompt(argc, argv, numCount);
+    if(numCount  == 0)
+    {
+        if(!init(script.c_str(), hand, special))
         return 1;
+    }
+    
 
     cout << "####################金牌：" << GameRummy::getCardString(special) << endl;
     cout<<"#################初始手牌: "<<hand.size()<<endl;

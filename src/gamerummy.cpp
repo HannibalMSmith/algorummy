@@ -233,6 +233,7 @@ int GameRummy::match(const map<int, PCard> &hand, vector<CardGroup> &runList, ve
     buildRun(hand, runList, candidates);
     buildMeldAndSet(candidates, runList, meldList, setList);
     buildCandidates(runList, meldList, setList, candidates);
+    
     unMatchedList = candidates;
     return 0;
 }

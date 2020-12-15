@@ -12,5 +12,6 @@
 #define LOG(format, ...) {}
 #endif
 
-const char* scriptPrompt(int argc, char **argv);
+const char* scriptPrompt(int argc, char **argv, int &numCount);
 bool init(const char* script, std::map<int, std::shared_ptr<Card>> &hand, Card &magic);
+void randomInit(std::map<int, std::shared_ptr<Card>> &hand, Card &magic);
