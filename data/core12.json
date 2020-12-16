@@ -1,0 +1,31 @@
+{
+    "a":"1 方块",
+    "b":"2 梅花",
+    "c":"3 红桃",
+    "d":"4 黑桃",
+    "e":"0 王",
+    "magiccard":{
+        "suit":2,
+        "rank":8
+    },
+    "hand":[
+        {
+            "player" : 0,
+            "card": [
+                {"suit" : 2, "rank" : 2},
+                {"suit" : 1, "rank" : 11},
+                {"suit" : 1, "rank" : 3},
+                {"suit" : 1, "rank" : 4},
+                {"suit" : 3, "rank" : 10},
+                {"suit" : 3, "rank" : 2},
+                {"suit" : 3, "rank" : 13},
+                {"suit" : 1, "rank" : 7},
+                {"suit" : 3, "rank" : 10},
+                {"suit" : 0, "rank" : 0},
+                {"suit" : 2, "rank" : 9},
+                {"suit" : 2, "rank" : 5},
+                {"suit" : 1, "rank" : 6}
+            ]
+        }
+    ]
+}

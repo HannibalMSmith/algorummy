@@ -23,7 +23,6 @@ public:
     Card();
     Card(E_SUIT suit, int rank, int goldrank);
     static int genId(){return ++idx;}
-    bool special();
 public:
     E_SUIT suit_;
     int rank_;
@@ -63,10 +62,11 @@ class GameRummy
 {
 public:
     using PCard = std::shared_ptr<Card>;
-    static void printCardGroup(const CardGroup &group);
+    static void printCardGroup(const CardGroup &group, int specialRank = c_idxerror);
     static std::string getCardString(const Card &card);
     int match(const std::map<int, PCard> &hand, std::vector<CardGroup> &runList, 
-                std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList, std::vector<CardGroup> &unMatchedList);
+                std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList, std::vector<CardGroup> &unmatchedList);
+private:                
     int buildRun(const std::map<int, PCard> &hand, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
     static int buildRunFromGroup(CardGroup &group, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
     static int buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &runList,
@@ -83,9 +83,10 @@ public:
                                 std::vector<CardGroup> &setList, std::vector<CardGroup> &candidates);
     static int getMaxCandidate(std::vector<CardGroup> &candidates, PCard &card);
     static bool expandToRunAndDelSource(std::vector<CardGroup> &runList, CardGroup &src);
-    static bool expandToMeldAndDelSource(std::vector<CardGroup> &targetList, CardGroup &src, int idx = 0);                            
-private:
+    static bool expandToMeldAndDelSource(std::vector<CardGroup> &targetList, CardGroup &src, int idx = 0);
+    static void arrangeUnmatchList(std::vector<CardGroup> &unmatchedList, std::vector<CardGroup> &newList);                          
     static void removeSetFromCandidates(std::vector<CardGroup> &candidates);
+    static bool buildMinorSet(std::vector<CardGroup> &unmatchedList, int idx, std::vector<CardGroup> &tempList, std::vector<CardGroup> &newList);
 public:
     int special_;
 private:
