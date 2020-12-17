@@ -38,7 +38,7 @@ class CardGroup
 {
 public:
     CardGroup(int id = genId(), int idxSetMember=c_idxerror, bool opotional=false) 
-    : idxSetMember_(idxSetMember), optional_(opotional), id_(id){}
+    : id_(id),idxSetMember_(idxSetMember), optional_(opotional){}
     static int genId(){return ++idx;}
     using PCard = std::shared_ptr<Card>;
     void removeCard(const PCard &card);
@@ -71,13 +71,15 @@ private:
     static int buildRunFromGroup(CardGroup &group, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
     static int buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &runList,
                                std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList);
-    static int buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &potential);
+    static int buildRunFromTop(CardGroup &group, CardGroup &run);
+    static int buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &meld);
     static int buildSetFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &set);
     static void markSet(std::vector<CardGroup> &candidates, CardGroup &group);
     static void buildRunOrMeld(std::vector<CardGroup> &candidates, std::vector<CardGroup> &runList,
                                std::vector<CardGroup> &meldList, CardGroup &group, int idxInCandidates);
     static bool tryBuildRunWithSpecial(CardGroup &specialGroup, CardGroup &meldCandidate, CardGroup &newGroup, PCard &special);
-    static bool findCardInBothMeldandSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &meldList, int rank, PCard &card, int &idxCandidates);
+    static int findCardInBothRunAndSet(std::vector<CardGroup> &tempRunList, int rankSet, PCard &cardInBoth, int &runInCandidates);
+    static int findCardInBothMeldAndSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &meldList, int rank, PCard &card, int &meldInCandidates);
     static int buildMeldWithRank(std::vector<CardGroup> &candidates, CardGroup &group, int rank);
     static int buildCandidates(std::vector<CardGroup> &runList, std::vector<CardGroup> &meldList, 
                                 std::vector<CardGroup> &setList, std::vector<CardGroup> &candidates);
