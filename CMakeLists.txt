@@ -11,7 +11,7 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug )
 endif()
 
 
-project(Rummy)
+project(rummy)
 
 include_directories(
     "${CMAKE_SOURCE_DIR}/inc"

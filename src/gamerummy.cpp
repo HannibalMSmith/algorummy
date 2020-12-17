@@ -6,6 +6,7 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <numeric>
 
 using std::cout;
 using std::endl;
@@ -56,13 +57,8 @@ void CardGroup::reset()
 
 int CardGroup::getGoal()
 {
-    //std::accumulate(cardlist_.begin(), cardlist_.end(), cardlist_.begin(), [](const PCard &a, const PCard &b){return a->getGoal()+b->getGoal()});
-    int goal = 0;
-    for (auto it : cardlist_)
-    {
-        goal += it->rank_;
-    }
-    return goal;
+    return std::accumulate(cardlist_.begin(), cardlist_.end(), 0, 
+    [](int goal, const PCard &card){return goal + card->rank_;});
 }
 
 bool CardGroup::expandToRun(const PCard &card)
@@ -303,10 +299,7 @@ int GameRummy::buildRunFromGroup(CardGroup &group, vector<CardGroup> &runList, v
         if (last == NULL)
         {
 #ifdef DEBUGMORE
-            cout << "last: "
-                 << "null"
-                 << ":"
-                 << "null";
+            cout << "last: " << "null" << ":" << "null";
             cout << " it: " << (*it)->suit_ << ":" << (*it)->rank_ << endl;
 #endif
             last = *it;
@@ -615,7 +608,6 @@ int GameRummy::buildMeldAndSet(vector<CardGroup> &candidates, vector<CardGroup> 
         }
         else
         {
-            //fix me with better bookkeep
             markSet(candidates, candidates[idxGroup]);
             int setSize = tempSetList[idxGroup].cardlist_.size();
             if (setSize > c_minimum)
