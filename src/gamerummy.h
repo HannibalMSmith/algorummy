@@ -64,16 +64,30 @@ public:
     using PCard = std::shared_ptr<Card>;
     static void printCardGroup(const CardGroup &group, int specialRank = c_idxerror);
     static std::string getCardString(const Card &card);
+    static bool greater4CardOrder(const PCard &a, const PCard &b){return a->rank_ > b->rank_;}
+    static bool less4CardOrder(const PCard &a, const PCard &b){return a->rank_ < b->rank_;}
     int match(const std::map<int, PCard> &hand, std::vector<CardGroup> &runList, 
                 std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList, std::vector<CardGroup> &unmatchedList);
-private:                
+private:
+    static int partitionHand(const std::map<int, PCard> &hand, std::vector<CardGroup> &candidates);
+    static int initRunList(std::vector<CardGroup> &candidates, std::vector<CardGroup> &runList);
+    static int buildGroupByScore(std::vector<CardGroup> &candidates, std::vector<CardGroup> &runList, 
+                                 std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList);
+    static int arrangeUnmatched(std::vector<CardGroup> &unmatchedList, std::vector<CardGroup> &newList);
+    static int buildRun(CardGroup &group, std::vector<CardGroup> &runList);
+    static int buildRunFromTop(CardGroup &group, CardGroup &run);
+    static int buildSetFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &set);
+    static int expandTopMaxToRunlist(const vector<int> &runGoal, int rank, std::vector<CardGroup> &candidates, std::vector<CardGroup> &runList);
+
+    
+
     int buildRun(const std::map<int, PCard> &hand, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
     static int buildRunFromGroup(CardGroup &group, std::vector<CardGroup> &runList, std::vector<CardGroup> &candidates);
     static int buildMeldAndSet(std::vector<CardGroup> &candidates, std::vector<CardGroup> &runList,
                                std::vector<CardGroup> &meldList, std::vector<CardGroup> &setList);
-    static int buildRunFromTop(CardGroup &group, CardGroup &run);
+    
     static int buildMeldFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &meld);
-    static int buildSetFromTop(std::vector<CardGroup> &candidates, CardGroup &group, CardGroup &set);
+    
     static void markSet(std::vector<CardGroup> &candidates, CardGroup &group);
     static void buildRunOrMeld(std::vector<CardGroup> &candidates, std::vector<CardGroup> &runList,
                                std::vector<CardGroup> &meldList, CardGroup &group, int idxInCandidates);
