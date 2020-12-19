@@ -712,7 +712,7 @@ void GameRummy::markSet(vector<CardGroup> &candidates, CardGroup &group)
         auto it = std::find_if(candidates[suit].cardlist_.begin(), candidates[suit].cardlist_.end(), [id](const PCard &item) { return item->id_ == id; });
         if (it != candidates[suit].cardlist_.end())
         {
-            candidates[suit].idxSetMember_ = it -  candidates[suit].cardlist_.begin();
+            candidates[suit].idxSetMember_ = it - candidates[suit].cardlist_.begin();
         }
     });
 }
@@ -890,7 +890,6 @@ int GameRummy::getMaxCandidate(vector<CardGroup> &candidates, PCard &card)
             goalList[idx] = candidates[idx].cardlist_[0]->rank_;
         }
     }
-
     auto itMax = std::max_element(goalList.begin(), goalList.end());
     if (*itMax == 0)
     {
@@ -948,6 +947,14 @@ bool GameRummy::expandToMeldAndDelSource(std::vector<CardGroup> &targetList, Car
 
 void GameRummy::arrangeUnmatched(std::vector<CardGroup> &unmatchedList, std::vector<CardGroup> &newList)
 {
+#ifdef DEBUGMORE
+    {
+        cout << "散牌整理#####################" << endl;
+        std::for_each(unmatchedList.begin(), unmatchedList.end(), [](const CardGroup &group) {
+            std::bind(printCardGroup, std::placeholders::_1, -1)(group);
+        });
+    }
+#endif
     vector<int> goalTop(kSuit);
     vector<CardGroup> tempList(kSuit);
     while (true)
@@ -963,14 +970,13 @@ void GameRummy::arrangeUnmatched(std::vector<CardGroup> &unmatchedList, std::vec
                 goalTop[i] = unmatchedList[i].cardlist_[0]->rank_;
             }
         }
-        auto itMax = std::max_element(goalTop.begin(), goalTop.end());
+        auto itMax = std::max_element(goalTop.begin() + 1, goalTop.end());
         if ((*itMax) == 0)
         {
             break;
         }
 
         int idx = itMax - goalTop.begin();
-        assert(unmatchedList[idx].cardlist_.size() != 0);
         if (unmatchedList[idx].cardlist_.size() == 1)
         {
             buildPotencialSet(unmatchedList, idx, tempList, newList);
@@ -991,12 +997,7 @@ void GameRummy::arrangeUnmatched(std::vector<CardGroup> &unmatchedList, std::vec
                     continue;
                 }
             }
-            if (unmatchedList[idx].cardlist_[0]->rank_ - unmatchedList[idx].cardlist_[1]->rank_ == 0)
-            {
-                tempList[idx].cardlist_.push_back(unmatchedList[idx].cardlist_[0]);
-                unmatchedList[idx].cardlist_.erase(unmatchedList[idx].cardlist_.begin());
-            }
-            else if (unmatchedList[idx].cardlist_[0]->rank_ - unmatchedList[idx].cardlist_[1]->rank_ == 1)
+            if (unmatchedList[idx].cardlist_[0]->rank_ - unmatchedList[idx].cardlist_[1]->rank_ == 1)
             {
                 CardGroup temp;
                 temp.cardlist_.insert(temp.cardlist_.end(), unmatchedList[idx].cardlist_.begin(), unmatchedList[idx].cardlist_.begin() + 2);
@@ -1009,13 +1010,13 @@ void GameRummy::arrangeUnmatched(std::vector<CardGroup> &unmatchedList, std::vec
             }
         }
     }
-    std::for_each(tempList.begin(), tempList.end(), [&newList](const CardGroup &group) { newList.push_back(group); });
-    newList.push_back(unmatchedList[0]);
+    std::for_each(tempList.begin() + 1, tempList.end(), [&newList](const CardGroup &group) { newList.push_back(group); });
+    newList.push_back(unmatchedList[e_joker]);
 }
 
 bool GameRummy::buildPotencialSet(std::vector<CardGroup> &unmatchedList, int idx, std::vector<CardGroup> &tempList, std::vector<CardGroup> &newList)
 {
-    int rankSet = unmatchedList[idx].cardlist_[0]->rank_;
+    int rank = unmatchedList[idx].cardlist_[0]->rank_;
     bool match = false;
     for (auto i = 1; i < kSuit; i++)
     {
@@ -1023,15 +1024,16 @@ bool GameRummy::buildPotencialSet(std::vector<CardGroup> &unmatchedList, int idx
         {
             continue;
         }
-        auto itSet = std::find_if(unmatchedList[i].cardlist_.begin(), unmatchedList[i].cardlist_.end(), [rankSet](const PCard &item) { return item->rank_ == rankSet; });
-        if (itSet != unmatchedList[i].cardlist_.end())
+        auto it = std::find_if(unmatchedList[i].cardlist_.begin(), unmatchedList[i].cardlist_.end(),
+                               [rank](const PCard &item) { return item->rank_ == rank; });
+        if (it != unmatchedList[i].cardlist_.end())
         {
             CardGroup temp;
-            temp.cardlist_.push_back(unmatchedList[i].cardlist_[0]);
-            temp.cardlist_.push_back((*itSet));
+            temp.cardlist_.push_back(unmatchedList[idx].cardlist_[0]);
+            temp.cardlist_.push_back((*it));
             newList.push_back(std::move(temp));
-            unmatchedList[idx].cardlist_.erase(unmatchedList[idx].cardlist_.begin());
-            unmatchedList[i].cardlist_.erase(itSet);
+            unmatchedList[idx].removeCard(unmatchedList[idx].cardlist_[0]);
+            unmatchedList[i].removeCard(*it);
             match = true;
             break;
         }
