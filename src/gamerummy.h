@@ -97,7 +97,7 @@ private:
     static int getMaxCandidate(std::vector<CardGroup> &candidates, PCard &card);
     static bool expandToRunAndDelSource(std::vector<CardGroup> &runList, CardGroup &srcGroup);
     static bool expandToMeldAndDelSource(std::vector<CardGroup> &targetList, CardGroup &src, int idx);
-    static bool buildPotencialSet(std::vector<CardGroup> &unmatchedList, int idx, std::vector<CardGroup> &tempList, std::vector<CardGroup> &newList);
+    static bool buildPotencialSetAndDelSource(std::vector<CardGroup> &unmatchedList, int idx, std::vector<CardGroup> &tempList, std::vector<CardGroup> &newList);
 
 public:
     int special_;

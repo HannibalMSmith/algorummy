@@ -586,6 +586,8 @@ int GameRummy::buildGroupByScore(std::vector<CardGroup> &candidates, std::vector
     return 0;
 }
 
+
+
 int GameRummy::buildRunFromTop(CardGroup &group, CardGroup &run)
 {
     if (group.cardlist_.size() < kCardMinimum)
@@ -979,7 +981,7 @@ void GameRummy::arrangeUnmatched(std::vector<CardGroup> &unmatchedList, std::vec
         int idx = itMax - goalTop.begin();
         if (unmatchedList[idx].cardlist_.size() == 1)
         {
-            buildPotencialSet(unmatchedList, idx, tempList, newList);
+            buildPotencialSetAndDelSource(unmatchedList, idx, tempList, newList);
         }
         else
         {
@@ -1006,7 +1008,7 @@ void GameRummy::arrangeUnmatched(std::vector<CardGroup> &unmatchedList, std::vec
             }
             else
             {
-                buildPotencialSet(unmatchedList, idx, tempList, newList);
+                buildPotencialSetAndDelSource(unmatchedList, idx, tempList, newList);
             }
         }
     }
@@ -1014,7 +1016,7 @@ void GameRummy::arrangeUnmatched(std::vector<CardGroup> &unmatchedList, std::vec
     newList.push_back(unmatchedList[e_joker]);
 }
 
-bool GameRummy::buildPotencialSet(std::vector<CardGroup> &unmatchedList, int idx, std::vector<CardGroup> &tempList, std::vector<CardGroup> &newList)
+bool GameRummy::buildPotencialSetAndDelSource(std::vector<CardGroup> &unmatchedList, int idx, std::vector<CardGroup> &tempList, std::vector<CardGroup> &newList)
 {
     int rank = unmatchedList[idx].cardlist_[0]->rank_;
     bool match = false;
