@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_BUILD_TYPE RelWithDebInfo)
 #set(CMAKE_BUILD_TYPE Release)
@@ -9,6 +10,26 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug )
         -DDEBUG -DDEBUGMORE
     )
 endif()
+
+set(CXX_FLAGS
+ -g
+ -DCHECK_PTHREAD_RETURN_VALUE
+ -D_FILE_OFFSET_BITS=64
+ -Wall
+ -Wextra
+ -Werror
+ -Wconversion
+ -Wno-unused-parameter
+ -Wold-style-cast
+ -Woverloaded-virtual
+ -Wpointer-arith
+ -Wshadow
+ -Wwrite-strings
+ -march=native
+ # -MMD
+ -std=c++11
+ -rdynamic
+ )
 
 
 project(rummy)
