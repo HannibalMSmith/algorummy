@@ -467,7 +467,8 @@ int GameRummy::buildGroupByScore(std::vector<CardGroup> &candidates, std::vector
                 {
                     int rank = tempSetList[idxMaxSet].cardlist_[0]->rank_;
                     PCard cardInBoth;
-                    int idxInBoth = findCardInSetAndMeld(tempMeldList, rank, cardInBoth, idxInBoth);
+                    int idxInBoth = 0;
+                    findCardInSetAndMeld(tempMeldList, rank, cardInBoth, idxInBoth);
                     if (idxInBoth != kIdxError)
                     {
                         tempSetList[idxMaxSet].removeCard(cardInBoth);
@@ -547,7 +548,7 @@ int GameRummy::buildGroupByScore(std::vector<CardGroup> &candidates, std::vector
             }
             CardGroup minorSet;
             buildMinorSetFromTop(candidates, idxMaxTop, minorSet);
-            if (tempMeldList[idxMaxTop].getGoal() > 0 && runList.size() + meldList.size() < kSequenceMinimum ||
+            if ((tempMeldList[idxMaxTop].getGoal() > 0 && runList.size() + meldList.size() < kSequenceMinimum) ||
                 tempMeldList[idxMaxTop].getGoal() > minorSet.getGoal())
             {
                 candidates[idxMaxTop].removeGroup(tempMeldList[idxMaxTop]);
